@@ -15,6 +15,7 @@ import {
   FormDescription,
   FormMessage,
 } from "@/components/ui/form";
+import { toast } from "sonner";
 
 export const Login: React.FC = () => {
   const userSchema = z.object({
@@ -32,6 +33,12 @@ export const Login: React.FC = () => {
 
   const onSubmit = (data: NewCycleFormData) => {
     console.log(data);
+    toast.success("Enviamos um link de autenticação para o seu email", {
+      action: {
+        label: "Reenviar",
+        onClick: () => onSubmit(data),
+      },
+    });
   };
 
   return (

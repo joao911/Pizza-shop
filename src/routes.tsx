@@ -5,11 +5,13 @@ import { SignOutLayout } from "./screens/_layouts/SignOutLayout";
 import { Login } from "./screens/signOut/Login";
 import { SignUp } from "./screens/signOut/SignUp";
 import { Orders } from "./screens/sigIn/Orders";
+import { NotFound } from "./screens/404";
 
 export const router = createBrowserRouter([
   {
     path: "/",
     element: <SignInLayout />,
+    errorElement: <NotFound />,
     children: [
       {
         path: "/",

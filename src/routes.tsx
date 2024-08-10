@@ -4,7 +4,7 @@ import { DashBoard } from "./screens/sigIn/DashBoard";
 import { SignOutLayout } from "./screens/_layouts/SignOutLayout";
 import { Login } from "./screens/signOut/Login";
 import { SignUp } from "./screens/signOut/SignUp";
-import { Orders } from "./screens/sigIn/DashBoard/Orders";
+import { Orders } from "./screens/sigIn/Orders";
 
 export const router = createBrowserRouter([
   {

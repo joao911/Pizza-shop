@@ -3,6 +3,8 @@ import { Helmet } from "react-helmet-async";
 import { DollarSign, Utensils } from "lucide-react";
 
 import { CardComponent } from "./components/CardComponent";
+import { RevenueChart } from "./components/RevenueChart";
+import { PopularProductsChart } from "./components/PopularProductsChart";
 
 // import { Container } from './styles';
 
@@ -41,6 +43,10 @@ export const DashBoard: React.FC = () => {
             subtitle="mês passado"
             icon={<DollarSign className="h-4 w-4 text-foreground" />}
           />
+        </div>
+        <div className="grid grid-cols-9 gap-4">
+          <RevenueChart />
+          <PopularProductsChart />
         </div>
       </div>
     </div>

@@ -3,6 +3,8 @@ import { SignInLayout } from "./screens/_layouts/SignInLayout";
 import { DashBoard } from "./screens/sigIn/DashBoard";
 import { SignOutLayout } from "./screens/_layouts/SignOutLayout";
 import { Login } from "./screens/signOut/Login";
+import { SignUp } from "./screens/signOut/SignUp";
+import { Orders } from "./screens/sigIn/DashBoard/Orders";
 
 export const router = createBrowserRouter([
   {
@@ -13,6 +15,10 @@ export const router = createBrowserRouter([
         path: "/",
         element: <DashBoard />,
       },
+      {
+        path: "/orders",
+        element: <Orders />,
+      },
     ],
   },
   {
@@ -22,6 +28,10 @@ export const router = createBrowserRouter([
       {
         path: "/login",
         element: <Login />,
+      },
+      {
+        path: "/sign-up",
+        element: <SignUp />,
       },
     ],
   },

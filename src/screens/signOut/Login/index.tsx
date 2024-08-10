@@ -16,6 +16,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { toast } from "sonner";
+import { Link } from "react-router-dom";
 
 export const Login: React.FC = () => {
   const userSchema = z.object({
@@ -44,6 +45,9 @@ export const Login: React.FC = () => {
   return (
     <>
       <Helmet title="Login" />
+      <Button variant="ghost" asChild className="absolute right-8 top-8">
+        <Link to="/sign-up">Novo estabelecimento</Link>
+      </Button>
       <div className="p-8">
         <div className="flex w-[350px] flex-col justify-center gap-6">
           <div className="flex flex-col gap-2 text-center">

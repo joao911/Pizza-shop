@@ -17,6 +17,8 @@ import {
 } from "@/components/ui/form";
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
+import { useMutation } from "@tanstack/react-query";
+import { useLogin } from "./useLogin";
 
 export const Login: React.FC = () => {
   const userSchema = z.object({
@@ -32,14 +34,22 @@ export const Login: React.FC = () => {
     resolver: zodResolver(userSchema),
   });
 
-  const onSubmit = (data: NewCycleFormData) => {
-    console.log(data);
-    toast.success("Enviamos um link de autenticação para o seu email", {
-      action: {
-        label: "Reenviar",
-        onClick: () => onSubmit(data),
-      },
-    });
+  const { mutateAsync: authenticate } = useMutation({
+    mutationFn: useLogin,
+  });
+
+  const onSubmit = async (data: NewCycleFormData) => {
+    try {
+      await authenticate({ email: data.email });
+      toast.success("Enviamos um link de autenticação para o seu email", {
+        action: {
+          label: "Reenviar",
+          onClick: () => onSubmit(data),
+        },
+      });
+    } catch (error) {
+      toast.error("Credenciais inválidas");
+    }
   };
 
   return (

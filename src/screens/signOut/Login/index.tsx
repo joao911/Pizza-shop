@@ -16,11 +16,12 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { toast } from "sonner";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import { useLogin } from "./useLogin";
 
 export const Login: React.FC = () => {
+  const [searchParams] = useSearchParams();
   const userSchema = z.object({
     email: z.string().min(1, "Email é obrigatório").email("Email inválido"),
   });
@@ -32,6 +33,9 @@ export const Login: React.FC = () => {
     formState: { errors },
   } = useForm<NewCycleFormData>({
     resolver: zodResolver(userSchema),
+    defaultValues: {
+      email: searchParams.get("email") ?? "",
+    },
   });
 
   const { mutateAsync: authenticate } = useMutation({
@@ -48,6 +52,7 @@ export const Login: React.FC = () => {
         },
       });
     } catch (error) {
+      console.log(error);
       toast.error("Credenciais inválidas");
     }
   };

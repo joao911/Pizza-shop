@@ -28,3 +28,6 @@ export async function getManagerRestaurant() {
   const response = await api.get<GetManagedResponse>("/managed-restaurant");
   return response.data;
 }
+export async function signOut() {
+  await api.post("/sign-out");
+}

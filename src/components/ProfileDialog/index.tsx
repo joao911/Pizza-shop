@@ -15,12 +15,17 @@ import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
 import { getManagerRestaurant } from "../AccountMenu/useAccountMenu";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { updateProfile } from "./useUpdateProfile";
 import { toast } from "sonner";
+import { DialogClose } from "@radix-ui/react-dialog";
 
 export const ProfileDialog: React.FC = () => {
+  const queryClient = useQueryClient();
   const { data: managedRestaurant } = useQuery({
     queryKey: ["managed-restaurant"],
     queryFn: getManagerRestaurant,
+    staleTime: Infinity,
   });
 
   const userSchema = z.object({
@@ -32,7 +37,7 @@ export const ProfileDialog: React.FC = () => {
   const {
     handleSubmit,
     register,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<NewCycleFormData>({
     resolver: zodResolver(userSchema),
     values: {
@@ -40,10 +45,43 @@ export const ProfileDialog: React.FC = () => {
       description: managedRestaurant?.description ?? "",
     },
   });
+  function UpdateManagerResturantCache({
+    name,
+    description,
+  }: NewCycleFormData) {
+    const cached = queryClient.getQueryData<any>(["managed-restaurant"]);
+    if (cached) {
+      queryClient.setQueryData<any>(["managed-restaurant"], {
+        ...cached,
+        name,
+        description,
+      });
+    }
+    return {
+      cached,
+    };
+  }
 
+  const { mutateAsync: updateProfileFN } = useMutation({
+    mutationFn: updateProfile,
+    onMutate: ({ name, description }) => {
+      const { cached } = UpdateManagerResturantCache({ name, description });
+      return { previousProfile: cached };
+    },
+    onError(_, __, context) {
+      if (context?.previousProfile) {
+        UpdateManagerResturantCache(context.previousProfile);
+      }
+    },
+  });
   const onSubmit = async (data: NewCycleFormData) => {
     try {
-    } catch (error) {}
+      updateProfileFN({ name: data.name, description: data.description });
+      toast.success("Informações atualizadas com sucesso");
+    } catch (error) {
+      console.log("error", error);
+      toast.error("Erro ao atualizar as informações");
+    }
   };
 
   return (
@@ -78,10 +116,12 @@ export const ProfileDialog: React.FC = () => {
           </div>
         </div>
         <DialogFooter>
-          <Button variant="ghost" type="button">
-            Cancelar
-          </Button>
-          <Button type="submit" variant="success">
+          <DialogClose asChild>
+            <Button variant="ghost" type="button">
+              Cancelar
+            </Button>
+          </DialogClose>
+          <Button type="submit" variant="success" disabled={isSubmitting}>
             Salvar
           </Button>
         </DialogFooter>

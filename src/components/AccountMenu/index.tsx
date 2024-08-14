@@ -25,6 +25,7 @@ export const AccountMenu: React.FC = () => {
   const { data: managedRestaurant, isLoading: isLoadingManaged } = useQuery({
     queryKey: ["managed-restaurant"],
     queryFn: getManagerRestaurant,
+    staleTime: Infinity,
   });
   return (
     <Dialog>

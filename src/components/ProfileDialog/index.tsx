@@ -14,14 +14,14 @@ import { Button } from "../ui/button";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
-import { getManagerRestaurant } from "../AccountMenu/useAccountMenu";
+
 import { toast } from "sonner";
 
 export const ProfileDialog: React.FC = () => {
-  const { data: managedRestaurant } = useQuery({
-    queryKey: ["managed-restaurant"],
-    queryFn: getManagerRestaurant,
-  });
+  // const { data: managedRestaurant } = useQuery({
+  //   queryKey: ["managed-restaurant"],
+  //   queryFn: getManagerRestaurant,
+  // });
 
   const userSchema = z.object({
     name: z.string().min(1, "Nome é obrigatório"),
@@ -35,10 +35,10 @@ export const ProfileDialog: React.FC = () => {
     formState: { errors },
   } = useForm<NewCycleFormData>({
     resolver: zodResolver(userSchema),
-    values: {
-      name: managedRestaurant?.name ?? "",
-      description: managedRestaurant?.description ?? "",
-    },
+    // values: {
+    //   name: managedRestaurant?.name ?? "",
+    //   description: managedRestaurant?.description ?? "",
+    // },
   });
 
   const onSubmit = async (data: NewCycleFormData) => {

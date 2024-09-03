@@ -12,7 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Link, useNavigate } from "react-router-dom";
 import { handlePhoneChange } from "@/ultils/masks";
 import { useMutation } from "@tanstack/react-query";
-import { useSignUp } from "./useSigUp";
+import { registerRestaurant } from "@/api/register-restaurant";
 
 export const SignUp: React.FC = () => {
   const navigate = useNavigate();
@@ -34,21 +34,22 @@ export const SignUp: React.FC = () => {
     resolver: zodResolver(userSchema),
   });
   const { mutateAsync: registerCompany } = useMutation({
-    mutationFn: useSignUp,
+    mutationFn: registerRestaurant,
   });
 
   const onSubmit = async (data: NewCycleFormData) => {
+    const { email, managerName, restaurantName } = data;
     try {
       await registerCompany({
-        restaurantName: data.restaurantName,
-        managerName: data.managerName,
-        email: data.email,
+        restaurantName,
+        managerName,
+        email,
         phone: data.phoneNumber,
       });
       toast.success("Cadastrado com sucesso", {
         action: {
           label: "Login",
-          onClick: () => navigate("/login?email=${data.email}"),
+          onClick: () => navigate(`/login?email=${data.email}`),
         },
       });
     } catch (error) {

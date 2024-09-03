@@ -11,20 +11,21 @@ import {
 import { Button } from "../ui/button";
 import { Building, ChevronDown, LogOut } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import { getManagerRestaurant, getProfile } from "./useAccountMenu";
+
 import { Skeleton } from "../ui/skeleton";
 import { Dialog, DialogTrigger } from "../ui/dialog";
 import { ProfileDialog } from "../ProfileDialog";
+import { getManagedRestaurant } from "@/api/get-managed-restaurant";
+import { getProfile } from "@/api/getProfile";
 
 export const AccountMenu: React.FC = () => {
   const { data: profile, isLoading: isLoadingProfile } = useQuery({
     queryKey: ["profile"],
     queryFn: getProfile,
   });
-
   const { data: managedRestaurant, isLoading: isLoadingManaged } = useQuery({
     queryKey: ["managed-restaurant"],
-    queryFn: getManagerRestaurant,
+    queryFn: getManagedRestaurant,
   });
   return (
     <Dialog>

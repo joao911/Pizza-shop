@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -19,16 +19,22 @@ import { getManagedRestaurant } from "@/api/get-managed-restaurant";
 import { getProfile } from "@/api/getProfile";
 
 export const AccountMenu: React.FC = () => {
+  const [isOpen, setIsOpen] = useState(false);
+
   const { data: profile, isLoading: isLoadingProfile } = useQuery({
     queryKey: ["profile"],
     queryFn: getProfile,
+    staleTime: Infinity,
   });
+
   const { data: managedRestaurant, isLoading: isLoadingManaged } = useQuery({
     queryKey: ["managed-restaurant"],
     queryFn: getManagedRestaurant,
+    staleTime: Infinity,
   });
+
   return (
-    <Dialog>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
@@ -71,7 +77,7 @@ export const AccountMenu: React.FC = () => {
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-      <ProfileDialog />
+      <ProfileDialog setIsOpen={setIsOpen} />
     </Dialog>
   );
 };

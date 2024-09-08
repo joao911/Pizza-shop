@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useSearchParams } from "react-router-dom";
+import { isEmpty } from "lodash";
 
 export const OrderTableFilter: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -30,14 +31,30 @@ export const OrderTableFilter: React.FC = () => {
 
   type OrderFilter = z.infer<typeof orderFilterSchema>;
 
-  const { handleSubmit, register, control, reset } = useForm<OrderFilter>({
-    resolver: zodResolver(orderFilterSchema),
-    defaultValues: {
-      orderId: orderId ?? "",
-      customerName: customerName ?? "",
-      status: status ?? "all",
-    },
-  });
+  const { handleSubmit, register, control, reset, watch } =
+    useForm<OrderFilter>({
+      resolver: zodResolver(orderFilterSchema),
+      defaultValues: {
+        orderId: orderId ?? "",
+        customerName: customerName ?? "",
+        status: status ?? "all",
+      },
+    });
+
+  const watchedStatus = watch("status");
+  const wanchedOrderId = watch("orderId");
+  const wanchedCustomerName = watch("customerName");
+
+  const handleReset = () => {
+    reset();
+    setSearchParams((state) => {
+      state.delete("orderId");
+      state.delete("customerName");
+      state.delete("status");
+      state.set("page", "1");
+      return state;
+    });
+  };
 
   const onSubmit = (data: OrderFilter) => {
     const { orderId, customerName, status } = data;
@@ -61,6 +78,7 @@ export const OrderTableFilter: React.FC = () => {
       return state;
     });
   };
+
   return (
     <form className="flex items-center gap-2" onSubmit={handleSubmit(onSubmit)}>
       <span className="text-sm font-semibold">Filtros:</span>
@@ -106,10 +124,12 @@ export const OrderTableFilter: React.FC = () => {
         <Search className="mr-2 h-4 w-4" />
         Filtrar
       </Button>
-      <Button variant="outline" size="xs" type="button">
-        <X className="mr-2 h-4 w-4" />
-        Remover filtros
-      </Button>
+      {wanchedOrderId || wanchedCustomerName || watchedStatus !== "all" ? (
+        <Button variant="outline" size="xs" type="button" onClick={handleReset}>
+          <X className="mr-2 h-4 w-4" />
+          Remover filtros
+        </Button>
+      ) : null}
     </form>
   );
 };

@@ -1,13 +1,16 @@
 import React, { useState } from "react";
 import { ArrowBigRight, X, Search } from "lucide-react";
-import { formatDistanceToNow } from "date-fns";
-import { ptBR } from "date-fns/locale/pt-BR";
+import { includes } from "lodash";
 
 import { Button } from "@/components/ui/button";
 import { TableRow, TableCell } from "@/components/ui/table";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { OrderDetails } from "../OrderDetails";
 import { OrderStatus } from "../OrderStatus";
+import { formatDistanceToNowLocale } from "@/ultils/masks";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { cancelOrder } from "@/api/cancel-order";
+import { getOrderResponse } from "@/api/get-order";
 
 interface IOrderTableRowProps {
   order: {
@@ -21,6 +24,35 @@ interface IOrderTableRowProps {
 
 export const OrderTableRow: React.FC<IOrderTableRowProps> = ({ order }) => {
   const [open, setOpen] = useState(false);
+  const queryClient = useQueryClient();
+
+  const { mutateAsync: cancelOrderFn } = useMutation({
+    mutationFn: cancelOrder,
+    async onSuccess(_, { orderId }) {
+      const ordersListCache = queryClient.getQueriesData<getOrderResponse>({
+        queryKey: ["orders"],
+      });
+
+      ordersListCache.forEach(([cacheKey, cacheData]) => {
+        if (!cacheData) {
+          return;
+        }
+        queryClient.setQueryData<getOrderResponse>(cacheKey, {
+          ...cacheData,
+          orders: cacheData.orders.map((order) => {
+            if (order.orderId === orderId) {
+              return {
+                ...order,
+                status: "canceled",
+              };
+            }
+            return order;
+          }),
+        });
+      });
+    },
+  });
+
   return (
     <TableRow>
       <TableCell>
@@ -38,10 +70,7 @@ export const OrderTableRow: React.FC<IOrderTableRowProps> = ({ order }) => {
         {order.orderId}
       </TableCell>
       <TableCell className="text-muted-foreground">
-        {formatDistanceToNow(new Date(order.createdAt), {
-          addSuffix: true,
-          locale: ptBR,
-        })}
+        {formatDistanceToNowLocale(new Date(order.createdAt))}
       </TableCell>
       <TableCell>
         <OrderStatus status={order.status} />
@@ -60,7 +89,13 @@ export const OrderTableRow: React.FC<IOrderTableRowProps> = ({ order }) => {
         </Button>
       </TableCell>
       <TableCell>
-        <Button variant={"ghost"} size="xs">
+        <Button
+          variant={"ghost"}
+          size="xs"
+          disabled={!includes(["pending", "processing"], order.status)}
+          className={`${!includes(["pending", "processing"], order.status) ? "text-red-600" : "text-white"}`}
+          onClick={() => cancelOrderFn({ orderId: order.orderId })}
+        >
           <X className="mr-2 h-3 w-3" />
           Cancelar
         </Button>

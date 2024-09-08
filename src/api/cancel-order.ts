@@ -1,9 +1,9 @@
 import { api } from ".";
 
-interface GetOrderCancelParams {
+interface CancelOrderParams {
   orderId: string;
 }
 
-export async function cancelOrder({ orderId }: GetOrderCancelParams) {
-  await api.patch(`/orders/${orderId}/cancel`);
+export async function cancelOrder({ orderId }: CancelOrderParams) {
+  await api.patch(`/orders/${orderId}/approve`);
 }

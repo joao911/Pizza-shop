@@ -1,13 +1,12 @@
-import React from "react";
+import React, { useState } from "react";
 import { ArrowBigRight, X, Search } from "lucide-react";
-import { formatDistanceToNow } from "date-fns";
-import { ptBR } from "date-fns/locale/pt-BR";
 
 import { Button } from "@/components/ui/button";
 import { TableRow, TableCell } from "@/components/ui/table";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { OrderDetails } from "../OrderDetails";
 import { OrderStatus } from "../OrderStatus";
+import { formatCurrency, formatDistanceToNowLocale } from "@/utils";
 
 interface IOrderTableRowProps {
   order: {
@@ -20,37 +19,32 @@ interface IOrderTableRowProps {
 }
 
 export const OrderTableRow: React.FC<IOrderTableRowProps> = ({ order }) => {
+  const [isOpen, setIsOpen] = useState(false);
   return (
     <TableRow>
       <TableCell>
-        <Dialog>
+        <Dialog open={isOpen} onOpenChange={setIsOpen}>
           <DialogTrigger asChild>
             <Button variant={"outline"} size={"xs"}>
               <Search className="h-3 w-3" />
               <span className="sr-only">Detalhes do pedido</span>
             </Button>
           </DialogTrigger>
-          <OrderDetails />
+          <OrderDetails orderId={order.orderId} open={isOpen} />
         </Dialog>
       </TableCell>
       <TableCell className="font-mono text-xs font-medium">
         {order.orderId}
       </TableCell>
       <TableCell className="text-muted-foreground">
-        {formatDistanceToNow(new Date(order.createdAt), {
-          addSuffix: true,
-          locale: ptBR,
-        })}
+        {formatDistanceToNowLocale(new Date(order.createdAt))}
       </TableCell>
       <TableCell>
         <OrderStatus status={order.status} />
       </TableCell>
       <TableCell className="font-medium">{order.customerName}</TableCell>
       <TableCell className="font-medium">
-        {order.total.toLocaleString("pt-BR", {
-          style: "currency",
-          currency: "BRL",
-        })}
+        {formatCurrency.format(order.total / 100)}
       </TableCell>
       <TableCell>
         <Button variant={"outline"} size="xs">

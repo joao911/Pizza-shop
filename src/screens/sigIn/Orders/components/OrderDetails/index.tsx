@@ -14,10 +14,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useQuery } from "@tanstack/react-query";
-import { toString, map } from "lodash";
+import { map } from "lodash";
 
-import { getOrderDetails } from "@/api/get-order-details";
-import { formatCurrency, formatDistanceToNowLocale } from "@/utils";
+import { getOrderDetails } from "@/api/get-orer-details";
+import { formatCurrency, formatDistanceToNowLocale } from "@/ultils/masks";
 
 interface IOrderDetailsProps {
   orderId: string;
@@ -29,7 +29,7 @@ export const OrderDetails: React.FC<IOrderDetailsProps> = ({
   open,
 }) => {
   const { data: order } = useQuery({
-    queryKey: ["orders", orderId],
+    queryKey: ["orderDetails", orderId],
     queryFn: () => getOrderDetails({ orderId }),
     enabled: open,
   });
@@ -57,19 +57,19 @@ export const OrderDetails: React.FC<IOrderDetailsProps> = ({
             <TableRow>
               <TableCell className="text-muted-foreground">Cliente</TableCell>
               <TableCell className="flex justify-end">
-                {order?.customer?.name}
+                {order?.customer.name}
               </TableCell>
             </TableRow>
             <TableRow>
               <TableCell className="text-muted-foreground">Telefone</TableCell>
               <TableCell className="flex justify-end">
-                {order?.customer.phone ?? "Não informado"}
+                {order?.customer?.phone ?? "Não informado"}
               </TableCell>
             </TableRow>
             <TableRow>
               <TableCell className="text-muted-foreground">Email</TableCell>
               <TableCell className="flex justify-end">
-                {order?.customer?.email}
+                {order?.customer?.email ?? "Não informado"}
               </TableCell>
             </TableRow>
             <TableRow>
@@ -77,9 +77,7 @@ export const OrderDetails: React.FC<IOrderDetailsProps> = ({
                 Realizado há
               </TableCell>
               <TableCell className="flex justify-end">
-                {formatDistanceToNowLocale(
-                  new Date(toString(order?.createdAt)),
-                )}
+                {order && formatDistanceToNowLocale(new Date(order?.createdAt))}
               </TableCell>
             </TableRow>
           </TableBody>
@@ -105,7 +103,7 @@ export const OrderDetails: React.FC<IOrderDetailsProps> = ({
                 </TableCell>
                 <TableCell className="text-right">
                   {formatCurrency.format(
-                    (item.priceInCents * item.quantity) / 100,
+                    (item.priceInCents / 100) * item.quantity,
                   )}
                 </TableCell>
               </TableRow>
@@ -117,7 +115,7 @@ export const OrderDetails: React.FC<IOrderDetailsProps> = ({
                 Total do pedido
               </TableCell>
               <TableCell className="text-right">
-                {order && formatCurrency.format(order.totalInCents / 100)}
+                {order && formatCurrency.format(order?.totalInCents / 100)}
               </TableCell>
             </TableRow>
           </TableFooter>

@@ -1,12 +1,25 @@
 import React from "react";
 import { ArrowBigRight, X, Search } from "lucide-react";
+import { formatDistanceToNow } from "date-fns";
+import { ptBR } from "date-fns/locale/pt-BR";
 
 import { Button } from "@/components/ui/button";
 import { TableRow, TableCell } from "@/components/ui/table";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { OrderDetails } from "../OrderDetails";
+import { OrderStatus } from "../OrderStatus";
 
-export const OrderTableRow: React.FC = () => {
+interface IOrderTableRowProps {
+  order: {
+    orderId: string;
+    createdAt: string;
+    status: "pending" | "canceled" | "processing" | "delivering" | "delivered";
+    customerName: string;
+    total: number;
+  };
+}
+
+export const OrderTableRow: React.FC<IOrderTableRowProps> = ({ order }) => {
   return (
     <TableRow>
       <TableCell>
@@ -21,17 +34,24 @@ export const OrderTableRow: React.FC = () => {
         </Dialog>
       </TableCell>
       <TableCell className="font-mono text-xs font-medium">
-        4654321324165
+        {order.orderId}
       </TableCell>
-      <TableCell className="text-muted-foreground"> há 15 minutos</TableCell>
+      <TableCell className="text-muted-foreground">
+        {formatDistanceToNow(new Date(order.createdAt), {
+          addSuffix: true,
+          locale: ptBR,
+        })}
+      </TableCell>
       <TableCell>
-        <div className="flex items-center gap-2">
-          <span className="h-2 w-2 rounded-full bg-slate-400" />
-          <span className="font-medium text-muted-foreground">Pendente</span>
-        </div>
+        <OrderStatus status={order.status} />
       </TableCell>
-      <TableCell className="font-medium">João Paulo Duarte</TableCell>
-      <TableCell className="font-medium">R$ 149</TableCell>
+      <TableCell className="font-medium">{order.customerName}</TableCell>
+      <TableCell className="font-medium">
+        {order.total.toLocaleString("pt-BR", {
+          style: "currency",
+          currency: "BRL",
+        })}
+      </TableCell>
       <TableCell>
         <Button variant={"outline"} size="xs">
           <ArrowBigRight className="mr-2 h-3 w-3" />

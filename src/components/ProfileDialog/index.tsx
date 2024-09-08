@@ -27,7 +27,6 @@ interface IProfileDialogProps {
 }
 export const ProfileDialog: React.FC<IProfileDialogProps> = ({ setIsOpen }) => {
   const queryClient = useQueryClient();
-
   const { data: managedRestaurant } = useQuery({
     queryKey: ["managed-restaurant"],
     queryFn: getManagedRestaurant,

@@ -15,12 +15,10 @@ import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
 
+import { updateProfile } from "./useUpdateProfile";
 import { toast } from "sonner";
-import {
-  GetManagedRestaurant,
-  getManagedRestaurant,
-} from "@/api/get-managed-restaurant";
-import { updateProfile } from "@/api/updateProfile";
+import { DialogClose } from "@radix-ui/react-dialog";
+import { getManagedRestaurant } from "@/api/get-managed-restaurant";
 
 interface IProfileDialogProps {
   setIsOpen(value: boolean): void;
@@ -35,14 +33,13 @@ export const ProfileDialog: React.FC<IProfileDialogProps> = ({ setIsOpen }) => {
 
   const userSchema = z.object({
     name: z.string().min(1, "Nome é obrigatório"),
-    description: z.string().min(1, "Descrição é obrigatório").nullable(),
+    description: z.string().min(1, "Descrição é obrigatório"),
   });
   type NewCycleFormData = z.infer<typeof userSchema>;
 
   const {
     handleSubmit,
     register,
-    reset,
     formState: { errors, isSubmitting },
   } = useForm<NewCycleFormData>({
     resolver: zodResolver(userSchema),
@@ -51,44 +48,44 @@ export const ProfileDialog: React.FC<IProfileDialogProps> = ({ setIsOpen }) => {
       description: managedRestaurant?.description ?? "",
     },
   });
-
-  function updateRestaurantCached({ name, description }: NewCycleFormData) {
-    const cached = queryClient.getQueryData<GetManagedRestaurant>([
-      "managed-restaurant",
-    ]);
-
+  function UpdateManagerResturantCache({
+    name,
+    description,
+  }: NewCycleFormData) {
+    const cached = queryClient.getQueryData<any>(["managed-restaurant"]);
     if (cached) {
-      queryClient.setQueryData<GetManagedRestaurant>(["managed-restaurant"], {
+      queryClient.setQueryData<any>(["managed-restaurant"], {
         ...cached,
         name,
         description,
       });
     }
-    return { cached };
+    return {
+      cached,
+    };
   }
 
-  const { mutateAsync: updateProfileFn } = useMutation({
+  const { mutateAsync: updateProfileFN } = useMutation({
     mutationFn: updateProfile,
-    onMutate({ name, description }) {
-      const { cached } = updateRestaurantCached({ name, description });
+    onMutate: ({ name, description }) => {
+      const { cached } = UpdateManagerResturantCache({ name, description });
       return { previousProfile: cached };
     },
-    onError(_error, _variables, context) {
+    onError(_, __, context) {
       if (context?.previousProfile) {
-        updateRestaurantCached(context.previousProfile);
+        UpdateManagerResturantCache(context.previousProfile);
       }
     },
   });
-
   const onSubmit = async (data: NewCycleFormData) => {
     setIsOpen(false);
     const { name, description } = data;
     try {
-      await updateProfileFn({ name, description });
-      toast.success("Perfil atualizado com sucesso");
+      updateProfileFN({ name, description });
+      toast.success("Informações atualizadas com sucesso");
     } catch (error) {
-      console.log(error);
-      toast.error("Falha ao atualizar perfil, tente novamente");
+      console.log("error", error);
+      toast.error("Erro ao atualizar as informações");
     }
   };
 
@@ -126,16 +123,11 @@ export const ProfileDialog: React.FC<IProfileDialogProps> = ({ setIsOpen }) => {
           </div>
         </div>
         <DialogFooter>
-          <Button
-            variant="ghost"
-            type="button"
-            onClick={() => {
-              setIsOpen(false);
-              reset();
-            }}
-          >
-            Cancelar
-          </Button>
+          <DialogClose asChild>
+            <Button variant="ghost" type="button">
+              Cancelar
+            </Button>
+          </DialogClose>
           <Button type="submit" variant="success" disabled={isSubmitting}>
             Salvar
           </Button>

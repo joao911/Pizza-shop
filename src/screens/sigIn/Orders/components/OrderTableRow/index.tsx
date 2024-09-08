@@ -11,6 +11,7 @@ import { formatDistanceToNowLocale } from "@/ultils/masks";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { cancelOrder } from "@/api/cancel-order";
 import { getOrderResponse } from "@/api/get-order";
+import { formatCurrency } from "@/utils";
 
 interface IOrderTableRowProps {
   order: {
@@ -77,10 +78,7 @@ export const OrderTableRow: React.FC<IOrderTableRowProps> = ({ order }) => {
       </TableCell>
       <TableCell className="font-medium">{order.customerName}</TableCell>
       <TableCell className="font-medium">
-        {order.total.toLocaleString("pt-BR", {
-          style: "currency",
-          currency: "BRL",
-        })}
+        {formatCurrency.format(order.total / 100)}
       </TableCell>
       <TableCell>
         <Button variant={"outline"} size="xs">

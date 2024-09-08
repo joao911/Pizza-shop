@@ -1,3 +1,4 @@
+import React from "react";
 import {
   DialogContent,
   DialogDescription,
@@ -7,20 +8,36 @@ import {
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableFooter,
-  TableHead,
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import React from "react";
+import { useQuery } from "@tanstack/react-query";
+import { map } from "lodash";
 
-export const OrderDetails: React.FC = () => {
+import { getOrderDetails } from "@/api/get-orer-details";
+import { formatCurrency, formatDistanceToNowLocale } from "@/ultils/masks";
+
+interface IOrderDetailsProps {
+  orderId: string;
+  open: boolean;
+}
+
+export const OrderDetails: React.FC<IOrderDetailsProps> = ({
+  orderId,
+  open,
+}) => {
+  const { data: order } = useQuery({
+    queryKey: ["orderDetails", orderId],
+    queryFn: () => getOrderDetails({ orderId }),
+    enabled: open,
+  });
+
   return (
     <DialogContent>
       <DialogHeader>
-        <DialogTitle> Pedido: 4456465465</DialogTitle>
+        <DialogTitle> Pedido: {orderId}</DialogTitle>
         <DialogDescription>Detalhes do pedido</DialogDescription>
       </DialogHeader>
       <div className="space-y-6">
@@ -40,24 +57,28 @@ export const OrderDetails: React.FC = () => {
             <TableRow>
               <TableCell className="text-muted-foreground">Cliente</TableCell>
               <TableCell className="flex justify-end">
-                João Paulo Duarte
+                {order?.customer.name}
               </TableCell>
             </TableRow>
             <TableRow>
               <TableCell className="text-muted-foreground">Telefone</TableCell>
-              <TableCell className="flex justify-end">11970154082</TableCell>
+              <TableCell className="flex justify-end">
+                {order?.customer?.phone ?? "Não informado"}
+              </TableCell>
             </TableRow>
             <TableRow>
               <TableCell className="text-muted-foreground">Email</TableCell>
               <TableCell className="flex justify-end">
-                joaopaulolacerda911@gmail.com
+                {order?.customer?.email ?? "Não informado"}
               </TableCell>
             </TableRow>
             <TableRow>
               <TableCell className="text-muted-foreground">
                 Realizado há
               </TableCell>
-              <TableCell className="flex justify-end">há 3 minutos</TableCell>
+              <TableCell className="flex justify-end">
+                {order && formatDistanceToNowLocale(new Date(order?.createdAt))}
+              </TableCell>
             </TableRow>
           </TableBody>
         </Table>
@@ -71,19 +92,31 @@ export const OrderDetails: React.FC = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            <TableRow>
-              <TableCell className="text-right">Pizza portuguesa</TableCell>
-              <TableCell className="text-right">1</TableCell>
-              <TableCell className="text-right">R$ 36.00</TableCell>
-              <TableCell className="text-right">R$ 72.00</TableCell>
-            </TableRow>
+            {map(order?.orderItems, (item) => (
+              <TableRow key={item.id}>
+                <TableCell className="text-right">
+                  {item.product.name}
+                </TableCell>
+                <TableCell className="text-right">{item.quantity}</TableCell>
+                <TableCell className="text-right">
+                  {formatCurrency.format(item.priceInCents / 100)}
+                </TableCell>
+                <TableCell className="text-right">
+                  {formatCurrency.format(
+                    (item.priceInCents / 100) * item.quantity,
+                  )}
+                </TableCell>
+              </TableRow>
+            ))}
           </TableBody>
           <TableFooter>
             <TableRow>
               <TableCell colSpan={3} className="text-right">
                 Total do pedido
               </TableCell>
-              <TableCell className="text-right"> R$ 300</TableCell>
+              <TableCell className="text-right">
+                {order && formatCurrency.format(order?.totalInCents / 100)}
+              </TableCell>
             </TableRow>
           </TableFooter>
         </Table>

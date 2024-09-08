@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { ArrowBigRight, X, Search } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale/pt-BR";
@@ -20,17 +20,18 @@ interface IOrderTableRowProps {
 }
 
 export const OrderTableRow: React.FC<IOrderTableRowProps> = ({ order }) => {
+  const [open, setOpen] = useState(false);
   return (
     <TableRow>
       <TableCell>
-        <Dialog>
+        <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
             <Button variant={"outline"} size={"xs"}>
               <Search className="h-3 w-3" />
               <span className="sr-only">Detalhes do pedido</span>
             </Button>
           </DialogTrigger>
-          <OrderDetails />
+          <OrderDetails orderId={order.orderId} open={open} />
         </Dialog>
       </TableCell>
       <TableCell className="font-mono text-xs font-medium">

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -11,34 +11,40 @@ import {
 import { Button } from "../ui/button";
 import { Building, ChevronDown, LogOut } from "lucide-react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { useNavigate } from "react-router-dom";
 
-import { getManagerRestaurant, getProfile, signOut } from "./useAccountMenu";
 import { Skeleton } from "../ui/skeleton";
 import { Dialog, DialogTrigger } from "../ui/dialog";
 import { ProfileDialog } from "../ProfileDialog";
 
+import { getProfile } from "@/api/getProfile";
+import { singOut } from "@/api/sing-out";
+import { useNavigate } from "react-router-dom";
+import { getManagedRestaurant } from "@/api/get-managed-restaurant";
+
 export const AccountMenu: React.FC = () => {
+  const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
   const { data: profile, isLoading: isLoadingProfile } = useQuery({
     queryKey: ["profile"],
     queryFn: getProfile,
+    staleTime: Infinity,
   });
 
   const { data: managedRestaurant, isLoading: isLoadingManaged } = useQuery({
     queryKey: ["managed-restaurant"],
-    queryFn: getManagerRestaurant,
+    queryFn: getManagedRestaurant,
     staleTime: Infinity,
   });
 
   const { mutateAsync: signOutFn, isPending: isSigningOut } = useMutation({
-    mutationFn: signOut,
+    mutationFn: singOut,
     onSuccess: () => {
       navigate("/login", { replace: true });
     },
   });
+
   return (
-    <Dialog>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
@@ -87,7 +93,7 @@ export const AccountMenu: React.FC = () => {
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-      <ProfileDialog />
+      <ProfileDialog setIsOpen={setIsOpen} />
     </Dialog>
   );
 };

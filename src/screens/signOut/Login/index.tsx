@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Link, useSearchParams } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
-import { useLogin } from "./useLogin";
+import { useLogin } from "@/api/sign-in";
 
 export const Login: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -36,8 +36,9 @@ export const Login: React.FC = () => {
   });
 
   const onSubmit = async (data: NewCycleFormData) => {
+    const { email } = data;
     try {
-      await authenticate({ email: data.email });
+      await authenticate({ email });
       toast.success("Enviamos um link de autenticação para o seu email", {
         action: {
           label: "Reenviar",

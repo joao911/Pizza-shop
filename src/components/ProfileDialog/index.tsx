@@ -1,5 +1,5 @@
 import React from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -14,17 +14,20 @@ import { Button } from "../ui/button";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
-import { getManagerRestaurant } from "../AccountMenu/useAccountMenu";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+
 import { updateProfile } from "./useUpdateProfile";
 import { toast } from "sonner";
 import { DialogClose } from "@radix-ui/react-dialog";
+import { getManagedRestaurant } from "@/api/get-managed-restaurant";
 
-export const ProfileDialog: React.FC = () => {
+interface IProfileDialogProps {
+  setIsOpen(value: boolean): void;
+}
+export const ProfileDialog: React.FC<IProfileDialogProps> = ({ setIsOpen }) => {
   const queryClient = useQueryClient();
   const { data: managedRestaurant } = useQuery({
     queryKey: ["managed-restaurant"],
-    queryFn: getManagerRestaurant,
+    queryFn: getManagedRestaurant,
     staleTime: Infinity,
   });
 
@@ -75,8 +78,10 @@ export const ProfileDialog: React.FC = () => {
     },
   });
   const onSubmit = async (data: NewCycleFormData) => {
+    setIsOpen(false);
+    const { name, description } = data;
     try {
-      updateProfileFN({ name: data.name, description: data.description });
+      updateProfileFN({ name, description });
       toast.success("Informações atualizadas com sucesso");
     } catch (error) {
       console.log("error", error);
@@ -99,7 +104,9 @@ export const ProfileDialog: React.FC = () => {
               Nome
             </Label>
             <Input {...register("name")} id="name" className="col-span-3" />
-            <p className="text-sm text-red-500">{errors.name?.message}</p>
+            <p className="col-span-4 text-center text-sm text-red-500">
+              {errors.name?.message}
+            </p>
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
             <Label className="text-right" htmlFor="description">
@@ -110,7 +117,7 @@ export const ProfileDialog: React.FC = () => {
               id="description"
               className="col-span-3"
             />
-            <p className="text-sm text-red-500">
+            <p className="col-span-4 text-center text-sm text-red-500">
               {errors.description?.message}
             </p>
           </div>

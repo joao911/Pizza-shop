@@ -5,10 +5,34 @@ import { DollarSign, Utensils } from "lucide-react";
 import { CardComponent } from "./components/CardComponent";
 import { RevenueChart } from "./components/RevenueChart";
 import { PopularProductsChart } from "./components/PopularProductsChart";
-
-// import { Container } from './styles';
+import { useQuery } from "@tanstack/react-query";
+import { getDayOrderAmount } from "@/api/get-day-order-amount";
+import { getMonthOrdersAmount } from "@/api/get-month-order-amount";
+import { getMonthRevenue } from "@/api/get-month-revenue";
+import { formatCurrency } from "@/utils";
+import { getMonthCanceledOrdersAmount } from "@/api/get-month-canceled-order-amount";
 
 export const DashBoard: React.FC = () => {
+  const { data: dayOrdersAmount } = useQuery({
+    queryFn: getDayOrderAmount,
+    queryKey: ["metrics", "month-orders-amount"],
+  });
+
+  const { data: getMonthOrderAmountFn } = useQuery({
+    queryFn: getMonthOrdersAmount,
+    queryKey: ["metrics", "day-orders-amount"],
+  });
+
+  const { data: getMonthRevenueFN } = useQuery({
+    queryFn: getMonthRevenue,
+    queryKey: ["metrics", "revenue-amount"],
+  });
+
+  const { data: getMonthCanceledOrdersAmountFN } = useQuery({
+    queryFn: getMonthCanceledOrdersAmount,
+    queryKey: ["metrics", "canceled-orders-amount"],
+  });
+
   return (
     <div>
       <Helmet title="Dashboard" />
@@ -17,31 +41,36 @@ export const DashBoard: React.FC = () => {
         <div className="grid grid-cols-4 gap-4">
           <CardComponent
             title="Recita total (mês) "
-            value="R$ 15.000,00"
-            percentage="10"
+            value={
+              (getMonthRevenueFN &&
+                formatCurrency.format(getMonthRevenueFN.receipt / 100)) ||
+              0
+            }
+            percentage={getMonthRevenueFN?.diffFromLastMonth ?? 0}
             subtitle="mês passado"
             icon={<DollarSign className="h-4 w-4 text-foreground" />}
           />
           <CardComponent
             title="Pedidos (mês) "
-            value="245"
-            percentage="10"
+            value={getMonthOrderAmountFn?.amount ?? 0}
+            percentage={getMonthOrderAmountFn?.diffFromLastMonth ?? 0}
             subtitle="mês passado"
             icon={<Utensils className="h-4 w-4 text-foreground" />}
           />
           <CardComponent
             title="Pedidos  (dia) "
-            value="12"
-            percentage="10"
+            value={dayOrdersAmount?.amount ?? 0}
+            percentage={dayOrdersAmount?.diffFromYesterday ?? 0}
             subtitle="a ontem"
             icon={<Utensils className="h-4 w-4 text-foreground" />}
           />
           <CardComponent
             title="Cancelamento (mês) "
-            value="32"
-            percentage="10"
+            value={getMonthCanceledOrdersAmountFN?.amount ?? 0}
+            percentage={getMonthCanceledOrdersAmountFN?.diffFromLastMonth ?? 0}
             subtitle="mês passado"
             icon={<DollarSign className="h-4 w-4 text-foreground" />}
+            hasCanceledOrders
           />
         </div>
         <div className="grid grid-cols-9 gap-4">

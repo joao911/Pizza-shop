@@ -19,8 +19,6 @@ export const PopularProductsChart: React.FC = () => {
     queryKey: ["metrics", "popular-products"],
   });
 
-  console.log("getProductsPopularFN", popularProducts);
-
   const COLORS = [
     colors.sky["500"],
     colors.amber["500"],

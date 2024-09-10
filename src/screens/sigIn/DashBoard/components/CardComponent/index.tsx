@@ -3,11 +3,11 @@ import { CardHeader, CardTitle, CardContent, Card } from "@/components/ui/card";
 
 interface CardComponentProps {
   title: string;
-  value: string;
-  percentage: string;
+  value: number | string;
+  percentage: number;
   subtitle: string;
-
   icon?: React.ReactNode;
+  hasCanceledOrders?: boolean;
 }
 export const CardComponent: React.FC<CardComponentProps> = ({
   title,
@@ -15,6 +15,7 @@ export const CardComponent: React.FC<CardComponentProps> = ({
   percentage,
   subtitle,
   icon,
+  hasCanceledOrders,
 }) => {
   return (
     <Card>
@@ -24,12 +25,34 @@ export const CardComponent: React.FC<CardComponentProps> = ({
       </CardHeader>
       <CardContent className="space-y-1">
         <span className="text-3xl font-bold tracking-tighter">{value}</span>
-        <p className="text-xs text-muted-foreground">
-          <span className="text-emerald-500 dark:text-emerald-400">
-            {percentage}%
-          </span>{" "}
-          em relação {subtitle}
-        </p>
+        {!hasCanceledOrders && (
+          <p className="text-xs text-muted-foreground">
+            {percentage >= 0 ? (
+              <span className="text-emerald-500 dark:text-emerald-400">
+                +{percentage}%
+              </span>
+            ) : (
+              <span className="text-rose-500 dark:text-rose-400">
+                {percentage}%
+              </span>
+            )}{" "}
+            em relação {subtitle}
+          </p>
+        )}
+        {hasCanceledOrders && (
+          <p className="text-xs text-muted-foreground">
+            {percentage >= 0 ? (
+              <span className="text-rose-500 dark:text-rose-400">
+                + {percentage}%
+              </span>
+            ) : (
+              <span className="text-emerald-500 dark:text-emerald-400">
+                {percentage}%
+              </span>
+            )}{" "}
+            em relação {subtitle}
+          </p>
+        )}
       </CardContent>
     </Card>
   );

@@ -12,9 +12,10 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { BarChart } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { getProductsPopular } from "@/api/get-popular-products";
+import { SkeletonPopularProductsChart } from "../SkeletonPopularProductsChart";
 
 export const PopularProductsChart: React.FC = () => {
-  const { data: popularProducts } = useQuery({
+  const { data: popularProducts, isLoading } = useQuery({
     queryFn: getProductsPopular,
     queryKey: ["metrics", "popular-products"],
   });
@@ -37,7 +38,7 @@ export const PopularProductsChart: React.FC = () => {
         </div>
       </CardHeader>
       <CardContent>
-        {popularProducts && (
+        {popularProducts && !isLoading ? (
           <ResponsiveContainer width="100%" height={240}>
             <PieChart style={{ fontSize: 12 }}>
               <Pie
@@ -95,6 +96,8 @@ export const PopularProductsChart: React.FC = () => {
               </Pie>
             </PieChart>
           </ResponsiveContainer>
+        ) : (
+          <SkeletonPopularProductsChart />
         )}
       </CardContent>
     </Card>

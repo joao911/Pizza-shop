@@ -120,12 +120,12 @@ export const OrderTableFilter: React.FC = () => {
         }}
       />
 
-      <Button variant="secondary" size="xs" type="submit">
+      <Button variant="secondary" size="lg" type="submit">
         <Search className="mr-2 h-4 w-4" />
         Filtrar
       </Button>
       {wanchedOrderId || wanchedCustomerName || watchedStatus !== "all" ? (
-        <Button variant="outline" size="xs" type="button" onClick={handleReset}>
+        <Button variant="outline" size="lg" type="button" onClick={handleReset}>
           <X className="mr-2 h-4 w-4" />
           Remover filtros
         </Button>

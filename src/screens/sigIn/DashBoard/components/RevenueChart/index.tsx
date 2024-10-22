@@ -23,14 +23,14 @@ import { DatePickerWithRange } from "@/components/DateRangePicker";
 import { DateRange } from "react-day-picker";
 import { subDays } from "date-fns";
 import { map } from "lodash";
-import { formatCurrency } from "@/utils";
+import { SkeletonRevenueChart } from "../SkeletonRevenueChart";
 
 export const RevenueChart: React.FC = () => {
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
     from: subDays(new Date(), 7),
     to: new Date(),
   });
-  const { data: revenue } = useQuery({
+  const { data: revenue, isLoading } = useQuery({
     queryFn: () =>
       getDailyRevenueInPeriod({
         from: dateRange?.from,
@@ -48,8 +48,6 @@ export const RevenueChart: React.FC = () => {
     });
   }, [revenue]);
 
-  console.log(chartData);
-
   return (
     <Card className="col-span-6">
       <CardHeader className="flex-row items-center justify-between pb-8">
@@ -63,7 +61,7 @@ export const RevenueChart: React.FC = () => {
         </div>
       </CardHeader>
       <CardContent>
-        {chartData && (
+        {!isLoading ? (
           <ResponsiveContainer width="100%" height={248}>
             <LineChart data={chartData} style={{ fontSize: 12 }}>
               <XAxis
@@ -93,6 +91,8 @@ export const RevenueChart: React.FC = () => {
               />
             </LineChart>
           </ResponsiveContainer>
+        ) : (
+          <SkeletonRevenueChart />
         )}
       </CardContent>
     </Card>

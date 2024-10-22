@@ -13,22 +13,28 @@ import { formatCurrency } from "@/utils";
 import { getMonthCanceledOrdersAmount } from "@/api/get-month-canceled-order-amount";
 
 export const DashBoard: React.FC = () => {
-  const { data: dayOrdersAmount } = useQuery({
-    queryFn: getDayOrderAmount,
-    queryKey: ["metrics", "month-orders-amount"],
-  });
+  const { data: dayOrdersAmount, isLoading: loadingDayOrdersAmount } = useQuery(
+    {
+      queryFn: getDayOrderAmount,
+      queryKey: ["metrics", "month-orders-amount"],
+    },
+  );
 
-  const { data: getMonthOrderAmountFn } = useQuery({
-    queryFn: getMonthOrdersAmount,
-    queryKey: ["metrics", "day-orders-amount"],
-  });
+  const { data: getMonthOrderAmountFn, isLoading: loadingGetMonthOrderAmount } =
+    useQuery({
+      queryFn: getMonthOrdersAmount,
+      queryKey: ["metrics", "day-orders-amount"],
+    });
 
-  const { data: getMonthRevenueFN } = useQuery({
+  const { data: getMonthRevenueFN, isLoading: loadingGetMonth } = useQuery({
     queryFn: getMonthRevenue,
     queryKey: ["metrics", "revenue-amount"],
   });
 
-  const { data: getMonthCanceledOrdersAmountFN } = useQuery({
+  const {
+    data: getMonthCanceledOrdersAmountFN,
+    isLoading: loadingGetMonthCanceledOrdersAmount,
+  } = useQuery({
     queryFn: getMonthCanceledOrdersAmount,
     queryKey: ["metrics", "canceled-orders-amount"],
   });
@@ -49,6 +55,7 @@ export const DashBoard: React.FC = () => {
             percentage={getMonthRevenueFN?.diffFromLastMonth ?? 0}
             subtitle="mês passado"
             icon={<DollarSign className="h-4 w-4 text-foreground" />}
+            isLoading={loadingGetMonth}
           />
           <CardComponent
             title="Pedidos (mês) "
@@ -56,6 +63,7 @@ export const DashBoard: React.FC = () => {
             percentage={getMonthOrderAmountFn?.diffFromLastMonth ?? 0}
             subtitle="mês passado"
             icon={<Utensils className="h-4 w-4 text-foreground" />}
+            isLoading={loadingGetMonthOrderAmount}
           />
           <CardComponent
             title="Pedidos  (dia) "
@@ -63,6 +71,7 @@ export const DashBoard: React.FC = () => {
             percentage={dayOrdersAmount?.diffFromYesterday ?? 0}
             subtitle="a ontem"
             icon={<Utensils className="h-4 w-4 text-foreground" />}
+            isLoading={loadingDayOrdersAmount}
           />
           <CardComponent
             title="Cancelamento (mês) "
@@ -71,6 +80,7 @@ export const DashBoard: React.FC = () => {
             subtitle="mês passado"
             icon={<DollarSign className="h-4 w-4 text-foreground" />}
             hasCanceledOrders
+            isLoading={loadingGetMonthCanceledOrdersAmount}
           />
         </div>
         <div className="grid grid-cols-9 gap-4">

@@ -6,12 +6,13 @@ import { Login } from "./screens/signOut/Login";
 import { SignUp } from "./screens/signOut/SignUp";
 import { Orders } from "./screens/sigIn/Orders";
 import { NotFound } from "./screens/404";
+import { Error } from "./screens/Error";
 
 export const router = createBrowserRouter([
   {
     path: "/",
     element: <SignInLayout />,
-    errorElement: <NotFound />,
+    errorElement: <Error />,
     children: [
       {
         path: "/",
@@ -36,5 +37,9 @@ export const router = createBrowserRouter([
         element: <SignUp />,
       },
     ],
+  },
+  {
+    path: "*",
+    element: <NotFound />,
   },
 ]);

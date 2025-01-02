@@ -1,6 +1,6 @@
 import { api } from ".";
 
-interface updateProfileBody {
+export interface updateProfileBody {
   name: string;
   description: string | null;
 }

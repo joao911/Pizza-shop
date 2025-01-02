@@ -16,6 +16,8 @@ export const SignInLayout: React.FC = () => {
           const code = error.response?.data?.code;
           if (status === 401 && code === "UNAUTHORIZED") {
             navigate("/login", { replace: true });
+          } else {
+            throw error;
           }
         }
       },

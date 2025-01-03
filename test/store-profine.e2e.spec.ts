@@ -1,12 +1,19 @@
 import { test, expect } from "@playwright/test";
 
-test("sign is invalid", async ({ page }) => {
-  await page.goto("/login", { waitUntil: "networkidle" });
+test("update profile success", async ({ page }) => {
+  await page.goto("/", { waitUntil: "networkidle" });
 
-  await page.getByPlaceholder("Email").fill("j3eJp@examplesdsdrfsdf.com");
-  await page.getByRole("button", { name: "Acessar painel" }).click();
-  const toast = page.getByText("Credenciais inválidas");
+  await page.getByRole("button", { name: "Pizza Shop" }).click();
+  await page.getByText("Perfil da loja").click();
+  await page.getByLabel("Nome").fill("Pizza Shop 2");
+  await page.getByLabel("Descrição").fill("minha pizza favorita");
+  await page.getByRole("button", { name: "Salvar" }).click();
+
+  const toast = page.getByText("Informações atualizadas com");
 
   expect(toast).toBeVisible();
-  await page.waitForTimeout(5000);
+
+  expect(page.getByRole("button", { name: "Pizza Shop" })).toBeVisible();
+
+  await page.waitForTimeout(3000);
 });

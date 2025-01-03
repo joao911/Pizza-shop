@@ -54,6 +54,7 @@ export const SignUp: React.FC = () => {
       });
     } catch (error) {
       console.log("error", error);
+      toast.error("Erro ao cadastrar");
     }
   };
 
@@ -87,9 +88,9 @@ export const SignUp: React.FC = () => {
               </p>
             </div>
             <div className="space-y-4">
-              <Label htmlFor="restaurantName">Seu nome</Label>
+              <Label htmlFor="userName">Seu nome</Label>
               <Input
-                id="restaurantName"
+                id="userName"
                 placeholder="Seu nome"
                 {...register("managerName")}
                 className={`${errors.managerName && "border-red-500"}`}
@@ -99,13 +100,13 @@ export const SignUp: React.FC = () => {
               </p>
             </div>
             <div className="space-y-4">
-              <Label htmlFor="restaurantName">Telefone</Label>
+              <Label htmlFor="phoneNumber">Telefone</Label>
               <Controller
                 control={control}
                 name="phoneNumber"
                 render={({ field: { onChange, onBlur, value, ref } }) => (
                   <Input
-                    id="restaurantName"
+                    id="phoneNumber"
                     placeholder="Seu telefone"
                     onChange={(e) => onChange(handlePhoneChange(e))}
                     value={value}
@@ -121,9 +122,9 @@ export const SignUp: React.FC = () => {
               </p>
             </div>
             <div className="space-y-4">
-              <Label htmlFor="restaurantName">Email</Label>
+              <Label htmlFor="email">Email</Label>
               <Input
-                id="restaurantName"
+                id="email"
                 placeholder="Nome do restaurante"
                 {...register("email")}
                 className={`${errors.email && "border-red-500"}`}

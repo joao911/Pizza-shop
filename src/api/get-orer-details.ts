@@ -1,9 +1,9 @@
 import { api } from ".";
 
-interface GetOrderDetailsParams {
+export interface GetOrderDetailsParams {
   orderId: string;
 }
-interface getOrderDetailsResponse {
+export interface getOrderDetailsResponse {
   id: string;
   createdAt: string;
   status: "pending" | "canceled" | "processing" | "delivering" | "delivered";
